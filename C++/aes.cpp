@@ -374,6 +374,17 @@ void saveKeyToFile(const vector<unsigned char>& key, const string& filename) {
     }
 }
 
+void saveCipherToFile(const vector<unsigned char>& cipher, const string& filename) {
+    ofstream file(filename, ios::binary);
+    if (file.is_open()) {
+        file.write(reinterpret_cast<const char*>(cipher.data()), cipher.size());
+        file.close();
+    } else {
+        cerr << "Unable to open file for writing key: " << filename << endl;
+    }
+}
+
+
 vector<unsigned char> readKeyFromFile(const string& filename) {
     vector<unsigned char> key(16);
     ifstream file(filename, ios::binary);
@@ -384,6 +395,16 @@ vector<unsigned char> readKeyFromFile(const string& filename) {
         cerr << "Unable to open file for reading key: " << filename << endl;
     }
     return key;
+}
+
+std::vector<unsigned char> readCipherFromFile(const std::string& filename) {
+    std::ifstream file(filename, std::ios::binary);
+    if (!file) {
+        throw std::runtime_error("Не удалось открыть файл: " + filename);
+    }
+    std::vector<unsigned char> data((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    file.close();
+    return data;
 }
 
 vector<unsigned char> padData(const vector<unsigned char>& data) {
@@ -501,10 +522,11 @@ int main() {
         return 0;
     }
     
-    cout << "Enter text: ";
-    getline(cin, inputText);
-    
     if (choice == 1) {
+        cout << "Enter text: ";
+        getline(cin, inputText);
+    
+
         // Encryption
         key = generateKey();
         saveKeyToFile(key, keyFile);
@@ -521,6 +543,7 @@ int main() {
         
         vector<unsigned char> plaintext(inputText.begin(), inputText.end());
         vector<unsigned char> ciphertext = aesOFBEncrypt(plaintext, key, iv);
+        saveCipherToFile(ciphertext, "aes_cipher.bin");
         
         cout << "Ciphertext (hex): ";
         for (unsigned char c : ciphertext) {
@@ -567,12 +590,25 @@ int main() {
                 cerr << "Invalid input" << endl;
         }
         
-        // Convert hex string to bytes
         vector<unsigned char> ciphertext;
-        for (size_t i = 0; i < inputText.length(); i += 2) {
-            string byteString = inputText.substr(i, 2);
-            ciphertext.push_back(static_cast<unsigned char>(stoul(byteString, nullptr, 16)));
+        cout << "Choose:";
+        cin >> chooseFlag;
+        // Convert hex string to bytes
+        switch(chooseFlag) {
+            case 1:
+                cin >> inputText;
+                for (size_t i = 0; i < inputText.length(); i += 2) {
+                    string byteString = inputText.substr(i, 2);
+                    ciphertext.push_back(static_cast<unsigned char>(stoul(byteString, nullptr, 16)));
+                }
+                break;
+            case 2:
+                ciphertext = readCipherFromFile("aes_cipher.bin");
+                break;
+            default:
+                cerr << "Invalid input" << endl;
         }
+        
         
         vector<unsigned char> plaintext = aesOFBDecrypt(ciphertext, key, iv);
         

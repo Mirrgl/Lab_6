@@ -1,28 +1,28 @@
 import random
 from typing import List
 
-def print_vector(v):
-    for element in v:
-        print(f"{element:4d}", end="")
+def print_vector(vec: List[int]) -> None:
+    for element in vec:
+        print(f"{element:4}", end="")
     print()
 
-def print_matrix(matrix):
+def print_matrix(matrix: List[List[int]]) -> None:
     for row in matrix:
         print_vector(row)
     print()
 
-def create_matrix(start, end, M, N = 0):
-    if N == 0:
+def create_matrix(start, end, M: int, N: int = None) -> List[List[int]]:
+    if N is None:
         N = M
     
     matrix = []
     for _ in range(M):
-        matrix_line = [random.randint(start,end) for _ in range(N)]
+        matrix_line = [random.randint(start, end) for _ in range(N)]
         matrix.append(matrix_line)
     
     return matrix
 
-def find_line(matrix):
+def find_line(matrix: List[List[int]]) -> List[int]:
     max_count = -1
     max_line = []
     
@@ -34,9 +34,8 @@ def find_line(matrix):
     
     return max_line
 
-def first_task():
-    print("-----------Первое задание-----------")
-    
+def first_task() -> None:
+    print("-----------Первое задание-----------") 
     print("Ввод M и N (M > 7, N > 5)")
     while True:
         try:
@@ -58,10 +57,15 @@ def first_task():
     print(f"Строка с наибольшим количеством отрицательных значений: {line_index}")
     print_vector(max_line)
 
-def second_task():
-    print("-----------Второе задание-----------")
-    engine = random.SystemRandom()
-    
+def process_diagonal_element(value: int) -> int:
+    tens = value // 10
+    units = value % 10
+    digits = [tens, units]
+    digits.sort(reverse=True)
+    return digits[0] * 10 + digits[1]
+
+def second_task() -> None:
+    print("-----------Второе задание-----------")    
     print("Ввод M (M > 5)")
     while True:
         try:
@@ -77,20 +81,20 @@ def second_task():
     
     print_matrix(matrix)
     
+    # Process main diagonal
     diag1 = [matrix[i][i] for i in range(m)]
-    diag1.sort(reverse=True)
-    
+    diag1_processed = [process_diagonal_element(val) for val in diag1]
     print("Первая диагональ: ", end="")
-    print_vector(diag1)
+    print_vector(diag1_processed)
     
+    # Process anti-diagonal
     diag2 = [matrix[m - i - 1][i] for i in range(m)]
-    diag2.sort(reverse=True)
-    
+    diag2_processed = [process_diagonal_element(val) for val in diag2]
     print("Вторая диагональ: ", end="")
-    print_vector(diag2)
+    print_vector(diag2_processed)
     
-    sum1 = sum(diag1)
-    sum2 = sum(diag2)
+    sum1 = sum(diag1_processed)
+    sum2 = sum(diag2_processed)
     
     print(f"Сумма первой диагонали: {sum1}")
     print(f"Сумма второй диагонали: {sum2}")
@@ -102,7 +106,7 @@ def second_task():
     else:
         print("Суммы одинаковы")
 
-def input_board():
+def input_board() -> List[List[str]]:
     board = []
     
     while True:
@@ -124,6 +128,7 @@ def input_board():
         
         if len(board) >= 2 and len(board_line) >= 2:
             for i in range(len(board_line) - 1):
+                # Check 2x2 square: top-left, top-right, bottom-left, bottom-right
                 square = [
                     board[-2][i], board[-2][i + 1],
                     board[-1][i], board[-1][i + 1]
@@ -133,7 +138,7 @@ def input_board():
     
     return board
 
-def count_battleships(board):
+def count_battleships(board: List[List[str]]) -> int:
     if not board or not board[0]:
         return 0
     
@@ -145,9 +150,11 @@ def count_battleships(board):
             if board[i][j] == 'X':
                 is_first_cell = True
                 
+                # Check left neighbor
                 if j > 0 and board[i][j - 1] == 'X':
                     is_first_cell = False
                 
+                # Check top neighbor
                 if i > 0 and board[i - 1][j] == 'X':
                     is_first_cell = False
                 
@@ -156,7 +163,7 @@ def count_battleships(board):
     
     return count
 
-def third_task():
+def third_task() -> None:
     print("-----------Третье задание-----------")
     
     print("Введите доску с линкорами для игры в морской бой. Доска вводится построчно")
@@ -180,8 +187,9 @@ def third_task():
     result = count_battleships(board)
     print(f"Количество линкоров: {result}")
 
-first_task()
-print("\n" + "-" * 40 + "\n")
-second_task()
-print("\n" + "-" * 40 + "\n")
-third_task()
+if __name__ == "__main__":
+    first_task()
+    print("\n" + "-" * 40 + "\n")
+    second_task()
+    print("\n" + "-" * 40 + "\n")
+    third_task()

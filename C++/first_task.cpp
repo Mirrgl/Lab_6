@@ -91,7 +91,17 @@ void second(mt19937_64& engine) {
         diag.push_back(matrix[i][i]);
     }
 
-    sort(diag.begin(), diag.end(), [](int x, int y){return x > y;});
+    vector<int> temp;
+    string tempInt;
+    for (int i = 0; i < diag.size(); i++) {
+        temp.push_back(diag[i] / 10);
+        temp.push_back(diag[i] % 10);
+        sort(temp.begin(), temp.end(), [](int x, int y){return x > y;});
+        tempInt = string{} + to_string(temp[0]) + to_string(temp[1]);
+        diag[i] = stoi(tempInt);
+        temp = {};
+        tempInt = "";
+    }
 
     cout << "Первая диагональ: " << diag << endl;
 
@@ -101,7 +111,17 @@ void second(mt19937_64& engine) {
         diag2.push_back(matrix[m-i-1][i]);
     }
 
-    sort(diag2.begin(), diag2.end(), [](int x, int y){return x > y;});
+    temp = {};
+    tempInt = "";
+    for (int i = 0; i < diag2.size(); i++) {
+        temp.push_back(diag2[i] / 10);
+        temp.push_back(diag2[i] % 10);
+        sort(temp.begin(), temp.end(), [](int x, int y){return x > y;});
+        tempInt = string{} + to_string(temp[0]) + to_string(temp[1]);
+        diag2[i] = stoi(tempInt);
+        temp = {};
+        tempInt = "";
+    }
 
     cout << "Вторая диагональ: " << diag2 << endl;
 
